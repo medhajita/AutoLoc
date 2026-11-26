@@ -3,6 +3,9 @@ package autoloc.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "client")
 @Getter
@@ -32,4 +35,8 @@ public class Client {
 
     @Column(nullable = false, unique = true, length = 20)
     private String numeroPermis;
+
+    // Association bidirectionnelle Client ↔ Reservation (côté inverse : Client)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Reservation> reservations = new ArrayList<>();
 }

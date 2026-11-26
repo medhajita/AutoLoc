@@ -27,9 +27,9 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         vehiculeRepository.saveAll(List.of(
-            new Vehicule(null, "AB-123-CD", "Renault", "Clio", CategorieVehicule.CITADINE, new BigDecimal("45.00"), StatutVehicule.DISPONIBLE, null, new ArrayList<>()),
-            new Vehicule(null, "EF-456-GH", "Peugeot", "508",  CategorieVehicule.BERLINE,  new BigDecimal("75.00"), StatutVehicule.DISPONIBLE, null, new ArrayList<>()),
-            new Vehicule(null, "IJ-789-KL", "Toyota",  "RAV4", CategorieVehicule.SUV,      new BigDecimal("95.00"), StatutVehicule.MAINTENANCE, null, new ArrayList<>())
+            new Vehicule(null, "AB-123-CD", "Renault", "Clio", CategorieVehicule.CITADINE, new BigDecimal("45.00"), StatutVehicule.DISPONIBLE, null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()),
+            new Vehicule(null, "EF-456-GH", "Peugeot", "508",  CategorieVehicule.BERLINE,  new BigDecimal("75.00"), StatutVehicule.DISPONIBLE, null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>()),
+            new Vehicule(null, "IJ-789-KL", "Toyota",  "RAV4", CategorieVehicule.SUV,      new BigDecimal("95.00"), StatutVehicule.MAINTENANCE, null, new ArrayList<>(), new ArrayList<>(), new ArrayList<>())
         ));
     }
 }

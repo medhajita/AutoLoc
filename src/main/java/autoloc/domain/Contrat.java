@@ -38,6 +38,11 @@ public class Contrat {
     @Column
     private Integer kilometrageRetour;
 
+    // Association bidirectionnelle Reservation ↔ Contrat (côté propriétaire : Contrat)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id", nullable = false, unique = true)
+    private Reservation reservation;
+
     // Association bidirectionnelle Contrat → Paiements (côté propriétaire : Paiement.contrat)
     @OneToMany(mappedBy = "contrat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Paiement> paiements = new ArrayList<>();

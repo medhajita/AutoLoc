@@ -54,4 +54,12 @@ public class Vehicule {
         inverseJoinColumns = @JoinColumn(name = "equipement_id")
     )
     private List<Equipement> equipements = new ArrayList<>();
+
+    // Association bidirectionnelle Vehicule ↔ Reservation (côté inverse : Vehicule)
+    @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
+    private List<Reservation> reservations = new ArrayList<>();
+
+    // Association bidirectionnelle Vehicule ↔ Maintenance (côté inverse : Vehicule)
+    @OneToMany(mappedBy = "vehicule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Maintenance> maintenances = new ArrayList<>();
 }
