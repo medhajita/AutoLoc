@@ -29,4 +29,9 @@ public class Maintenance {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal cout;
+
+    // Association bidirectionnelle Vehicule ↔ Maintenance (côté propriétaire : Maintenance)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicule_id", nullable = false)
+    private Vehicule vehicule;
 }

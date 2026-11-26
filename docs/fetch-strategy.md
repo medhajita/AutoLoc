@@ -102,6 +102,99 @@ private List<Equipement> equipements = new ArrayList<>();
 private List<Vehicule> vehicules = new ArrayList<>();
 ```
 
+### 3.5 Client / Reservation — `@OneToMany` / `@ManyToOne` bidirectionnelle
+
+```
+Client (1) ──────────────── (*) Reservation
+          mappedBy="client"
+```
+
+- **Côté propriétaire** : `Reservation.client` — porte la FK `client_id`.
+- **Côté inverse** : `Client.reservations` — `mappedBy="client"`.
+- **Cascade** : `CascadeType.ALL` — toute opération sur un `Client` se propage à ses `Reservation`.
+- **orphanRemoval = true** — une `Reservation` retirée de `client.reservations` est supprimée en base.
+- **Fetch** : `LAZY` des deux côtés.
+
+```java
+// Client.java
+@OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private List<Reservation> reservations = new ArrayList<>();
+
+// Reservation.java
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "client_id", nullable = false)
+private Client client;
+```
+
+### 3.6 Reservation / Vehicule — `@ManyToOne` / `@OneToMany` bidirectionnelle
+
+```
+Vehicule (1) ──────────────── (*) Reservation
+            mappedBy="vehicule"
+```
+
+- **Côté propriétaire** : `Reservation.vehicule` — porte la FK `vehicule_id`.
+- **Côté inverse** : `Vehicule.reservations` — `mappedBy="vehicule"`.
+- **Cascade** : aucune — un `Vehicule` existe indépendamment de ses réservations.
+- **Fetch** : `LAZY` des deux côtés.
+
+```java
+// Reservation.java
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "vehicule_id", nullable = false)
+private Vehicule vehicule;
+
+// Vehicule.java
+@OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
+private List<Reservation> reservations = new ArrayList<>();
+```
+
+### 3.7 Reservation / Contrat — `@OneToOne` bidirectionnelle
+
+```
+Reservation (1) ──────────────── (1) Contrat
+               mappedBy="reservation"
+```
+
+- **Côté propriétaire** : `Contrat.reservation` — porte la FK `reservation_id` (unique).
+- **Côté inverse** : `Reservation.contrat` — `mappedBy="reservation"`.
+- **Cascade** : `CascadeType.ALL` + `orphanRemoval = true` sur le côté inverse — suppression d'une `Reservation` entraîne la suppression du `Contrat` associé.
+- **Fetch** : `LAZY` des deux côtés (surcharge du défaut EAGER de `@OneToOne`).
+
+```java
+// Contrat.java
+@OneToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "reservation_id", nullable = false, unique = true)
+private Reservation reservation;
+
+// Reservation.java
+@OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private Contrat contrat;
+```
+
+### 3.8 Vehicule / Maintenance — `@OneToMany` / `@ManyToOne` bidirectionnelle
+
+```
+Vehicule (1) ──────────────── (*) Maintenance
+            mappedBy="vehicule"
+```
+
+- **Côté propriétaire** : `Maintenance.vehicule` — porte la FK `vehicule_id`.
+- **Côté inverse** : `Vehicule.maintenances` — `mappedBy="vehicule"`.
+- **Cascade** : `CascadeType.ALL` + `orphanRemoval = true` — suppression d'un `Vehicule` entraîne la suppression de toutes ses `Maintenance`.
+- **Fetch** : `LAZY` des deux côtés.
+
+```java
+// Vehicule.java
+@OneToMany(mappedBy = "vehicule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private List<Maintenance> maintenances = new ArrayList<>();
+
+// Maintenance.java
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "vehicule_id", nullable = false)
+private Vehicule vehicule;
+```
+
 ## 4. Schéma généré
 
 ```sql
@@ -125,6 +218,22 @@ CREATE TABLE vehicule_equipement (
     FOREIGN KEY (vehicule_id)   REFERENCES vehicule(id_vehicule),
     FOREIGN KEY (equipement_id) REFERENCES equipement(id_equipement)
 );
+
+-- FK Reservation → Client
+ALTER TABLE reservation ADD COLUMN client_id BIGINT NOT NULL;
+ALTER TABLE reservation ADD CONSTRAINT fk_reservation_client FOREIGN KEY (client_id) REFERENCES client(id_client);
+
+-- FK Reservation → Vehicule
+ALTER TABLE reservation ADD COLUMN vehicule_id BIGINT NOT NULL;
+ALTER TABLE reservation ADD CONSTRAINT fk_reservation_vehicule FOREIGN KEY (vehicule_id) REFERENCES vehicule(id_vehicule);
+
+-- FK Contrat → Reservation (unique)
+ALTER TABLE contrat ADD COLUMN reservation_id BIGINT NOT NULL UNIQUE;
+ALTER TABLE contrat ADD CONSTRAINT fk_contrat_reservation FOREIGN KEY (reservation_id) REFERENCES reservation(id_reservation);
+
+-- FK Maintenance → Vehicule
+ALTER TABLE maintenance ADD COLUMN vehicule_id BIGINT NOT NULL;
+ALTER TABLE maintenance ADD CONSTRAINT fk_maintenance_vehicule FOREIGN KEY (vehicule_id) REFERENCES vehicule(id_vehicule);
 ```
 
 > Avec `spring.jpa.hibernate.ddl-auto=update`, Hibernate génère ces colonnes/tables automatiquement au démarrage.
