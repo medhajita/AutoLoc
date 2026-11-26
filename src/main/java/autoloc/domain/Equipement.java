@@ -3,6 +3,8 @@ package autoloc.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "equipement")
@@ -24,4 +26,8 @@ public class Equipement {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal tarifJournalier;
+
+    // Inverse de Vehicule.equipements
+    @ManyToMany(mappedBy = "equipements", fetch = FetchType.LAZY)
+    private List<Vehicule> vehicules = new ArrayList<>();
 }
