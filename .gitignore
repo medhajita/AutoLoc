@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local test scripts (out of scope, may contain local paths) ###
+run_autoloc_tests.js
+run_tests.py
+app-stdout.log
+app-stderr.log
+app-startup.log
