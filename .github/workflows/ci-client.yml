@@ -1,0 +1,30 @@
+name: CI client
+
+# Site client (/client/) : installation + build Vite à chaque PR et push sur main / dev_*
+on:
+  push:
+    branches: [main, 'dev_*']
+    paths: ['frontend/client/**', '.github/workflows/ci-client.yml']
+  pull_request:
+    paths: ['frontend/client/**', '.github/workflows/ci-client.yml']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/client/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: frontend/client/dist
+          retention-days: 7
