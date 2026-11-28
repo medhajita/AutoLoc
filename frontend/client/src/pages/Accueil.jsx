@@ -1,8 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, money, nbJours, today } from '../api.js'
-import { CarIcon } from '../components/Brand.jsx'
-
-const TINTS = ['#DBEAFE', '#CCFBF1', '#E2E8F0']
 const cap = (s) => s.charAt(0) + s.slice(1).toLowerCase()
 const ETAPES = [
   ['Choisissez vos dates', 'Indiquez le début et la fin de votre location : seuls les véhicules libres sont proposés.'],
@@ -66,7 +63,6 @@ export default function Accueil({ me, go, dates, setDates, onReserved }) {
     <>
       <section className="hero">
         <div className="hero-text">
-          <span className="pill pill-blue">Agence {agence}</span>
           <h1>
             Votre voiture,
             <br />
@@ -76,11 +72,15 @@ export default function Accueil({ me, go, dates, setDates, onReserved }) {
             Choisissez vos dates, comparez les véhicules disponibles et réservez en quelques clics. Modification et
             annulation en ligne.
           </p>
+          <button
+            type="button"
+            className="btn-dark"
+            onClick={() => document.getElementById('recherche')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            Choisir mes dates
+          </button>
         </div>
-        <div className="hero-art" aria-hidden="true">
-          <span className="hero-disc" />
-          <CarIcon width={340} />
-        </div>
+        <img className="hero-car" src={`${import.meta.env.BASE_URL}hero.webp`} alt="Voiture de sport blanche" />
       </section>
 
       <section className="section-pad" id="recherche">
@@ -135,13 +135,10 @@ export default function Accueil({ me, go, dates, setDates, onReserved }) {
         {loading && <p className="muted">Chargement des véhicules…</p>}
         {!loading && visibles.length === 0 && !error && <p className="muted">Aucun véhicule dans cette catégorie.</p>}
         <div className="cards">
-          {visibles.map((v, i) => (
+          {visibles.map((v) => (
             <article className="car-card" key={v.idVehicule}>
-              <div className="car-visual" style={{ background: TINTS[i % TINTS.length] }}>
-                <CarIcon />
-                <span className="pill pill-white">{cap(v.categorie)}</span>
-              </div>
               <div className="car-body">
+                <span className="pill pill-blue">{cap(v.categorie)}</span>
                 <div className="car-title">
                   <h3>
                     {v.marque} {v.modele}
@@ -149,10 +146,14 @@ export default function Accueil({ me, go, dates, setDates, onReserved }) {
                   <span className="muted">{money(v.tarifJournalier)} / jour</span>
                 </div>
                 <div className="car-bottom">
-                  <div>
-                    <div className="muted small">{datesOk ? `Total ${jours} j` : 'Total'}</div>
-                    <div className="total">{datesOk ? money(v.tarifJournalier * jours) : '—'}</div>
-                  </div>
+                  {datesOk ? (
+                    <div>
+                      <div className="muted small">{`Total ${jours} j`}</div>
+                      <div className="total">{money(v.tarifJournalier * jours)}</div>
+                    </div>
+                  ) : (
+                    <span />
+                  )}
                   {datesOk && !v.disponible ? (
                     <span className="pill pill-grey">Indisponible</span>
                   ) : (

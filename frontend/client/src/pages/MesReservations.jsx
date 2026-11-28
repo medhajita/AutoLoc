@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, dateFr, money, today } from '../api.js'
-import { CarIcon } from '../components/Brand.jsx'
 
 const STATUT = { EN_ATTENTE: 'En attente', CONFIRMEE: 'Confirmée', ANNULEE: 'Annulée', TERMINEE: 'Terminée' }
 const ONGLETS = [
@@ -8,7 +7,6 @@ const ONGLETS = [
   ['terminees', 'Terminées', (r) => r.statut === 'TERMINEE'],
   ['annulees', 'Annulées', (r) => r.statut === 'ANNULEE'],
 ]
-const TINTS = ['#DBEAFE', '#CCFBF1', '#E2E8F0']
 
 export default function MesReservations({ notice }) {
   const [items, setItems] = useState([])
@@ -59,12 +57,9 @@ export default function MesReservations({ notice }) {
           ))}
         </div>
         {visibles.length === 0 && <p className="muted">Aucune réservation dans cette catégorie.</p>}
-        {visibles.map((r, i) => (
+        {visibles.map((r) => (
           <article className="res-card" key={r.idReservation}>
             <div className="res-top">
-              <div className="res-visual" style={{ background: TINTS[i % TINTS.length] }}>
-                <CarIcon width={96} />
-              </div>
               <div className="res-info">
                 <div className="res-title">
                   <h2>{r.vehiculeLabel}</h2>
