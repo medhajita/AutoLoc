@@ -107,6 +107,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin", "/admin/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/prometheus").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/client", "/client/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/espace/inscription").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/espace/vehicules").permitAll()
                         .requestMatchers("/api/espace/**").hasRole("CLIENT")
