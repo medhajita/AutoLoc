@@ -45,3 +45,33 @@ en attente et annuler leurs réservations. Un client ne voit que ses propres ré
 (API `/api/espace/**`, rôle `CLIENT`, sans accès au back-office).
 
 Compte client de démonstration : `marie.dupont@example.com` / `client123`.
+
+## Sites web, CI/CD et déploiement en ligne
+
+Une seule application Spring Boot sert les deux interfaces :
+
+| URL | Interface | Code |
+|---|---|---|
+| `/client/` | Site client (réserver, gérer ses réservations) | `frontend/client` |
+| `/admin/` | Back-office (tableau de bord, réservations, contrats, véhicules, clients) | `frontend/admin` |
+| `/api/**` | API REST (HTTP Basic) | `src/main/java` |
+
+En local : `npm run dev` dans `frontend/client` (port 5173) ou `frontend/admin` (port 5174), l'API sur le port 8080.
+
+### CI / CD (GitHub Actions)
+
+- `ci-client.yml` / `ci-admin.yml` : build Vite de chaque interface (PR et push `main` / `dev_*`).
+- `ci-backend.yml` : tests Maven (H2) et build de l'image Docker complète.
+- `cd.yml` (merge sur `main`) : tests, publication de l'image `ghcr.io/<owner>/autoloc`, puis appel du Deploy Hook Render.
+
+### Variables d'environnement du service en ligne (Render)
+
+| Variable | Rôle |
+|---|---|
+| `SPRING_DATASOURCE_URL` | URL JDBC MySQL (TiDB Cloud : `jdbc:mysql://<hôte>:4000/<base>?sslMode=VERIFY_IDENTITY`) |
+| `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` | Identifiants de la base |
+| `AUTOLOC_ADMIN_PASSWORD` | Mot de passe du compte `admin` (défaut local : `admin123`) |
+| `AUTOLOC_STUDENT_PASSWORD` | Mot de passe du compte `student` (défaut local : `student123`) |
+| `AUTOLOC_DEMO_CLIENT_PASSWORD` | Mot de passe du client de démo `marie.dupont@example.com` |
+
+Secret GitHub à créer : `RENDER_DEPLOY_HOOK_URL` (Render > Settings > Deploy Hook).

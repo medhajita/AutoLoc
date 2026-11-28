@@ -6,3 +6,5 @@ target
 .env
 run_*.js
 run_*.py
+**/node_modules
+**/dist
