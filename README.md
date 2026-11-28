@@ -35,7 +35,7 @@ npm install
 npm run dev        # http://localhost:5173 (proxy /api -> http://localhost:8080)
 ```
 
-Comptes de démonstration : `student` / `student123` (USER), `admin` / `admin123` (ADMIN, seul autorisé à supprimer).
+Compte du personnel : `admin` / `admin123` (rôles USER + ADMIN, seul autorisé à supprimer). Comptes clients de démonstration : `marie.dupont@autoloc.com` / `client123` (et 7 autres en `@autoloc.com`).
 
 ### Espace client
 
@@ -71,7 +71,6 @@ En local : `npm run dev` dans `frontend/client` (port 5173) ou `frontend/admin` 
 | `SPRING_DATASOURCE_URL` | URL JDBC MySQL (TiDB Cloud : `jdbc:mysql://<hôte>:4000/<base>?sslMode=VERIFY_IDENTITY`) |
 | `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` | Identifiants de la base |
 | `AUTOLOC_ADMIN_PASSWORD` | Mot de passe du compte `admin` (défaut local : `admin123`) |
-| `AUTOLOC_STUDENT_PASSWORD` | Mot de passe du compte `student` (défaut local : `student123`) |
 | `AUTOLOC_DEMO_CLIENT_PASSWORD` | Mot de passe du client de démo `marie.dupont@example.com` |
 
 Secret GitHub à créer : `RENDER_DEPLOY_HOOK_URL` (Render > Settings > Deploy Hook).

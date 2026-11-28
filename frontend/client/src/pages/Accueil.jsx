@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { api, money, nbJours, today } from '../api.js'
+import { api, money, nbJours } from '../api.js'
+import DateRangePicker from '../components/DateRangePicker.jsx'
 const cap = (s) => s.charAt(0) + s.slice(1).toLowerCase()
 const ETAPES = [
   ['Choisissez vos dates', 'Indiquez le début et la fin de votre location : seuls les véhicules libres sont proposés.'],
@@ -85,14 +86,10 @@ export default function Accueil({ me, go, dates, setDates, onReserved }) {
 
       <section className="section-pad" id="recherche">
         <form className="search" onSubmit={(e) => e.preventDefault()}>
-          <label>
-            Du
-            <input type="date" min={today()} value={debut} onChange={(e) => setDates({ debut: e.target.value, fin: fin < e.target.value ? '' : fin })} />
-          </label>
-          <label>
-            Au
-            <input type="date" min={debut || today()} value={fin} onChange={(e) => setDates({ debut, fin: e.target.value })} />
-          </label>
+          <div className="field">
+            <span className="field-label">Dates de location</span>
+            <DateRangePicker value={dates} onChange={setDates} />
+          </div>
           <label>
             Catégorie
             <select value={categorie} onChange={(e) => setCategorie(e.target.value)}>

@@ -35,6 +35,10 @@ public final class EspaceDtos {
             boolean disponible) {
     }
 
+    /** Nombre de véhicules libres un jour donné (calendrier de sélection des dates). */
+    public record DisponibiliteJour(LocalDate date, int libres, int total) {
+    }
+
     public record DemandeReservation(
             @NotNull Long vehiculeId,
             @NotNull LocalDate dateDebut,

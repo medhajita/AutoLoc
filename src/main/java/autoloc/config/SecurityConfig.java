@@ -36,24 +36,18 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder, CompteClientRepository comptes,
-            // Mots de passe de démo en local ; en ligne ils sont remplacés par des variables d'environnement
-            @Value("${AUTOLOC_STUDENT_PASSWORD:student123}") String studentPassword,
+            // Mot de passe local par défaut ; en ligne il est remplacé par une variable d'environnement
             @Value("${AUTOLOC_ADMIN_PASSWORD:admin123}") String adminPassword) {
-        var user = User.builder()
-                .username("student")
-                .password(encoder.encode(studentPassword))
-                .roles("USER")
-                .build();
-
+        // Un seul compte du personnel : l'administrateur (il cumule les rôles USER et ADMIN)
         var admin = User.builder()
                 .username("admin")
                 .password(encoder.encode(adminPassword))
-                .roles("ADMIN")
+                .roles("USER", "ADMIN")
                 .build();
 
-        var enMemoire = new InMemoryUserDetailsManager(user, admin);
+        var enMemoire = new InMemoryUserDetailsManager(admin);
 
-        // Comptes en mémoire (student, admin) puis comptes clients en base (email, rôle CLIENT)
+        // Compte en mémoire (admin) puis comptes clients en base (email, rôle CLIENT)
         return username -> {
             try {
                 return enMemoire.loadUserByUsername(username);
@@ -109,7 +103,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/client", "/client/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/espace/inscription").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espace/vehicules").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espace/vehicules", "/api/espace/disponibilites").permitAll()
                         .requestMatchers("/api/espace/**").hasRole("CLIENT")
                         .requestMatchers("/api/me").authenticated()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

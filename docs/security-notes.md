@@ -17,8 +17,7 @@
 
 | Utilisateur | Mot de passe | Rôle  |
 |-------------|-------------|-------|
-| `student`   | `student123` | USER |
-| `admin`     | `admin123`  | ADMIN |
+| `admin`     | `admin123`  | USER + ADMIN |
 
 ## Règles d'autorisation
 
@@ -26,7 +25,7 @@
 |------------------------|------------------------|---------------|--------------------|
 | `GET /api/public/ping` | Tous (permitAll)       | Non           | Non                |
 | `GET /api/vehicules`   | USER + ADMIN           | Oui           | Non                |
-| `GET /api/admin/dashboard` | ADMIN uniquement   | Oui           | Oui (si USER)      |
+| `GET /api/admin/dashboard` | ADMIN uniquement   | Oui           | Oui (si client)    |
 
 ## Tests HTTP — Protocole de vérification
 
@@ -72,10 +71,10 @@ WWW-Authenticate: Basic realm="Realm"
 
 ---
 
-### 3. `GET /api/vehicules` — 200 avec USER
+### 3. `GET /api/vehicules` — 200 avec un compte authentifié (admin)
 
 ```bash
-curl -i -u student:student123 http://localhost:8080/api/vehicules
+curl -i -u admin:admin123 http://localhost:8080/api/vehicules
 ```
 
 Réponse attendue :
@@ -88,10 +87,10 @@ Vehicules: <n> enregistrement(s)
 
 ---
 
-### 4. `GET /api/admin/dashboard` — 403 avec USER
+### 4. `GET /api/admin/dashboard` — 403 avec un compte client
 
 ```bash
-curl -i -u student:student123 http://localhost:8080/api/admin/dashboard
+curl -i -u marie.dupont@autoloc.com:client123 http://localhost:8080/api/admin/dashboard
 ```
 
 Réponse attendue :

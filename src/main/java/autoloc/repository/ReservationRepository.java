@@ -43,6 +43,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     List<Long> vehiculeIdsOccupes(@Param("debut") LocalDate debut, @Param("fin") LocalDate fin);
 
+    /** Réservations actives (non annulées) touchant la période : base du calendrier de disponibilité. */
+    @Query("""
+            select r from Reservation r join fetch r.vehicule
+            where r.statut <> autoloc.domain.StatutReservation.ANNULEE
+              and r.dateDebut <= :fin and r.dateFin >= :debut
+            """)
+    List<Reservation> actives(@Param("debut") LocalDate debut, @Param("fin") LocalDate fin);
+
     @Override
     @EntityGraph(attributePaths = {"client", "vehicule", "contrat"})
     List<Reservation> findAll();

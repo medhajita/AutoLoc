@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,17 +50,17 @@ class SecurityIntegrationTests {
     }
 
     @Test
-    void vehiclesAcceptUserAuthentication() throws Exception {
+    void vehiclesAcceptAdminAuthentication() throws Exception {
         when(vehiculeRepository.findAll()).thenReturn(java.util.List.of());
 
-        mockMvc.perform(get("/api/vehicules").with(httpBasic("student", "student123")))
+        mockMvc.perform(get("/api/vehicules").with(httpBasic("admin", "admin123")))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }
 
     @Test
-    void adminDashboardRejectsUserRole() throws Exception {
-        mockMvc.perform(get("/api/admin/dashboard").with(httpBasic("student", "student123")))
+    void adminDashboardRejectsClientRole() throws Exception {
+        mockMvc.perform(get("/api/admin/dashboard").with(user("marie.dupont@autoloc.com").roles("CLIENT")))
                 .andExpect(status().isForbidden());
     }
 

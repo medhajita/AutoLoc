@@ -12,6 +12,7 @@ import autoloc.repository.ReservationRepository;
 import autoloc.repository.VehiculeRepository;
 import autoloc.web.dto.ClientDto;
 import autoloc.web.dto.EspaceDtos.DemandeReservation;
+import autoloc.web.dto.EspaceDtos.DisponibiliteJour;
 import autoloc.web.dto.EspaceDtos.Inscription;
 import autoloc.web.dto.EspaceDtos.MaReservation;
 import autoloc.web.dto.EspaceDtos.ModificationReservation;
@@ -106,6 +107,32 @@ public class EspaceClientController {
                         v.getTarifJournalier(), v.getAgence() == null ? null : v.getAgence().getNom(),
                         !occupes.contains(v.getIdVehicule())))
                 .toList();
+    }
+
+    /** Calendrier : pour chaque jour de la période, combien de véhicules (hors maintenance) sont libres. */
+    @GetMapping("/disponibilites")
+    @Transactional(readOnly = true)
+    public List<DisponibiliteJour> disponibilites(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debut,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
+        if (fin.isBefore(debut)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La date de fin précède la date de début");
+        }
+        if (ChronoUnit.DAYS.between(debut, fin) > 92) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Période trop longue (93 jours maximum)");
+        }
+        Set<Long> flotte = vehicules.findAll().stream()
+                .filter(v -> v.getStatut() != StatutVehicule.MAINTENANCE)
+                .map(Vehicule::getIdVehicule).collect(java.util.stream.Collectors.toSet());
+        List<Reservation> actives = reservations.actives(debut, fin).stream()
+                .filter(r -> flotte.contains(r.getVehicule().getIdVehicule())).toList();
+        return debut.datesUntil(fin.plusDays(1))
+                .map(jour -> {
+                    long occupes = actives.stream()
+                            .filter(r -> !r.getDateDebut().isAfter(jour) && !r.getDateFin().isBefore(jour))
+                            .map(r -> r.getVehicule().getIdVehicule()).distinct().count();
+                    return new DisponibiliteJour(jour, (int) (flotte.size() - occupes), flotte.size());
+                }).toList();
     }
 
     // ---------- rôle CLIENT ----------
