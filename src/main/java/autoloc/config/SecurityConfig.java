@@ -1,5 +1,6 @@
 package autoloc.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,16 +35,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder encoder, CompteClientRepository comptes) {
+    public UserDetailsService userDetailsService(PasswordEncoder encoder, CompteClientRepository comptes,
+            // Mots de passe de démo en local ; en ligne ils sont remplacés par des variables d'environnement
+            @Value("${AUTOLOC_STUDENT_PASSWORD:student123}") String studentPassword,
+            @Value("${AUTOLOC_ADMIN_PASSWORD:admin123}") String adminPassword) {
         var user = User.builder()
                 .username("student")
-                .password(encoder.encode("student123"))
+                .password(encoder.encode(studentPassword))
                 .roles("USER")
                 .build();
 
         var admin = User.builder()
                 .username("admin")
-                .password(encoder.encode("admin123"))
+                .password(encoder.encode(adminPassword))
                 .roles("ADMIN")
                 .build();
 
@@ -100,6 +104,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/error").permitAll()
+                        .requestMatchers("/admin", "/admin/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/prometheus").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/espace/inscription").permitAll()
