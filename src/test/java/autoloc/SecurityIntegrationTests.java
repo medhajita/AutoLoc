@@ -1,8 +1,11 @@
 package autoloc;
 
 import autoloc.config.SecurityConfig;
-import autoloc.controller.VehiculeController;
+import autoloc.controller.SecurityDemoController;
+import autoloc.repository.AgenceRepository;
+import autoloc.repository.CompteClientRepository;
 import autoloc.repository.VehiculeRepository;
+import autoloc.web.controller.VehiculeController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -16,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(VehiculeController.class)
+@WebMvcTest({SecurityDemoController.class, VehiculeController.class})
 @Import(SecurityConfig.class)
 class SecurityIntegrationTests {
 
@@ -25,6 +28,12 @@ class SecurityIntegrationTests {
 
     @MockitoBean
     private VehiculeRepository vehiculeRepository;
+
+    @MockitoBean
+    private AgenceRepository agenceRepository;
+
+    @MockitoBean
+    private CompteClientRepository compteClientRepository;
 
     @Test
     void publicPingIsAccessibleWithoutAuthentication() throws Exception {
@@ -41,16 +50,16 @@ class SecurityIntegrationTests {
 
     @Test
     void vehiclesAcceptUserAuthentication() throws Exception {
-        when(vehiculeRepository.count()).thenReturn(2L);
+        when(vehiculeRepository.findAll()).thenReturn(java.util.List.of());
 
-        mockMvc.perform(get("/api/vehicules").with(httpBasic("user", "user123")))
+        mockMvc.perform(get("/api/vehicules").with(httpBasic("student", "student123")))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Vehicules: 2 enregistrement(s)"));
+                .andExpect(content().json("[]"));
     }
 
     @Test
     void adminDashboardRejectsUserRole() throws Exception {
-        mockMvc.perform(get("/api/admin/dashboard").with(httpBasic("user", "user123")))
+        mockMvc.perform(get("/api/admin/dashboard").with(httpBasic("student", "student123")))
                 .andExpect(status().isForbidden());
     }
 

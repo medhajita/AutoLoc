@@ -17,7 +17,7 @@
 
 | Utilisateur | Mot de passe | Rôle  |
 |-------------|-------------|-------|
-| `user`      | `user123`   | USER  |
+| `student`   | `student123` | USER |
 | `admin`     | `admin123`  | ADMIN |
 
 ## Règles d'autorisation
@@ -75,7 +75,7 @@ WWW-Authenticate: Basic realm="Realm"
 ### 3. `GET /api/vehicules` — 200 avec USER
 
 ```bash
-curl -i -u user:user123 http://localhost:8080/api/vehicules
+curl -i -u student:student123 http://localhost:8080/api/vehicules
 ```
 
 Réponse attendue :
@@ -91,7 +91,7 @@ Vehicules: <n> enregistrement(s)
 ### 4. `GET /api/admin/dashboard` — 403 avec USER
 
 ```bash
-curl -i -u user:user123 http://localhost:8080/api/admin/dashboard
+curl -i -u student:student123 http://localhost:8080/api/admin/dashboard
 ```
 
 Réponse attendue :

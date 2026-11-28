@@ -3,6 +3,7 @@ package autoloc.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,16 +28,16 @@ public class Client {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String telephone;
 
-    @Column(nullable = false, length = 255)
-    private String adresse;
+    @Column(nullable = false, unique = true, length = 30)
+    private String numPermis;
 
-    @Column(nullable = false, unique = true, length = 20)
-    private String numeroPermis;
+    @Column(nullable = false)
+    private LocalDate dateInscription;
 
-    // Association bidirectionnelle Client ↔ Reservation (côté inverse : Client)
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    // Client 1 — * Reservation : Reservation possède la clé étrangère, PERSIST uniquement
+    @OneToMany(mappedBy = "client", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Reservation> reservations = new ArrayList<>();
 }

@@ -23,3 +23,25 @@ Services exposés par défaut :
 
 Les ports peuvent être modifiés avec `API_PORT`, `PROMETHEUS_PORT`,
 `GRAFANA_PORT` et `MYSQL_PORT`. Arrêt : `docker compose down`.
+
+## Interface web (React + Vite)
+
+L'API JSON (`/api/vehicules`, `/api/clients`, `/api/reservations`, `/api/contrats`, `/api/dashboard`)
+est consommée par `frontend/`.
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:5173 (proxy /api -> http://localhost:8080)
+```
+
+Comptes de démonstration : `student` / `student123` (USER), `admin` / `admin123` (ADMIN, seul autorisé à supprimer).
+
+### Espace client
+
+Les clients s'inscrivent eux-mêmes depuis l'écran de connexion (« Nouveau client ? Créer un compte »),
+puis peuvent réserver un véhicule (disponibilité selon les dates), modifier les dates d'une réservation
+en attente et annuler leurs réservations. Un client ne voit que ses propres réservations
+(API `/api/espace/**`, rôle `CLIENT`, sans accès au back-office).
+
+Compte client de démonstration : `marie.dupont@example.com` / `client123`.

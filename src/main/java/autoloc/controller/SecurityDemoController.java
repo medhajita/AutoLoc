@@ -1,19 +1,12 @@
 package autoloc.controller;
 
-import autoloc.repository.VehiculeRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class VehiculeController {
-
-    private final VehiculeRepository vehiculeRepository;
-
-    public VehiculeController(VehiculeRepository vehiculeRepository) {
-        this.vehiculeRepository = vehiculeRepository;
-    }
+public class SecurityDemoController {
 
     /**
      * Endpoint public — aucune authentification requise.
@@ -22,16 +15,6 @@ public class VehiculeController {
     @GetMapping("/public/ping")
     public String ping() {
         return "AutoLoc API is running";
-    }
-
-    /**
-     * Endpoint USER + ADMIN — authentification requise (rôle USER ou ADMIN).
-     * GET /api/vehicules → 200 OK, 401 si anonyme
-     */
-    @GetMapping("/vehicules")
-    public String listVehicules() {
-        long count = vehiculeRepository.count();
-        return "Vehicules: " + count + " enregistrement(s)";
     }
 
     /**

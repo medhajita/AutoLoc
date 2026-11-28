@@ -3,7 +3,6 @@ package autoloc.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -21,16 +20,12 @@ public class Maintenance {
     @Column(nullable = false)
     private LocalDate dateDebut;
 
-    @Column
     private LocalDate dateFin;
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String description;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal cout;
-
-    // Association bidirectionnelle Vehicule ↔ Maintenance (côté propriétaire : Maintenance)
+    // Vehicule 1 — * Maintenance (côté propriétaire : Maintenance)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicule_id", nullable = false)
     private Vehicule vehicule;

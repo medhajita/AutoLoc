@@ -2,9 +2,9 @@ package autoloc.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "equipement")
@@ -18,16 +18,10 @@ public class Equipement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idEquipement;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String nom;
-
-    @Column(length = 255)
-    private String description;
-
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal tarifJournalier;
+    @Column(nullable = false, length = 100)
+    private String libelle;
 
     // Inverse de Vehicule.equipements
     @ManyToMany(mappedBy = "equipements", fetch = FetchType.LAZY)
-    private List<Vehicule> vehicules = new ArrayList<>();
+    private Set<Vehicule> vehicules = new HashSet<>();
 }

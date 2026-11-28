@@ -21,12 +21,6 @@ public class Employe {
     @Column(nullable = false, length = 50)
     private String prenom;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
-
-    @Column(nullable = false, length = 20)
-    private String telephone;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private RoleEmploye role;

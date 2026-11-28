@@ -95,12 +95,15 @@ Vehicule (*) ──────────────── (*) Equipement
     joinColumns = @JoinColumn(name = "vehicule_id"),
     inverseJoinColumns = @JoinColumn(name = "equipement_id")
 )
-private List<Equipement> equipements = new ArrayList<>();
+private Set<Equipement> equipements = new HashSet<>();
 
 // Equipement.java
 @ManyToMany(mappedBy = "equipements", fetch = FetchType.LAZY)
-private List<Vehicule> vehicules = new ArrayList<>();
+private Set<Vehicule> vehicules = new HashSet<>();
 ```
+
+- **Pas de cascade** : un équipement est partagé entre plusieurs véhicules, supprimer un véhicule ne doit pas le supprimer.
+- **`Set`** : évite les doublons dans une association many-to-many.
 
 ### 3.5 Client / Reservation — `@OneToMany` / `@ManyToOne` bidirectionnelle
 
@@ -111,13 +114,12 @@ Client (1) ──────────────── (*) Reservation
 
 - **Côté propriétaire** : `Reservation.client` — porte la FK `client_id`.
 - **Côté inverse** : `Client.reservations` — `mappedBy="client"`.
-- **Cascade** : `CascadeType.ALL` — toute opération sur un `Client` se propage à ses `Reservation`.
-- **orphanRemoval = true** — une `Reservation` retirée de `client.reservations` est supprimée en base.
+- **Cascade** : `CascadeType.PERSIST` uniquement — une nouvelle `Reservation` ajoutée à un `Client` est enregistrée avec lui, mais supprimer un client n'efface pas silencieusement l'historique de ses réservations (ni leurs contrats et paiements).
 - **Fetch** : `LAZY` des deux côtés.
 
 ```java
 // Client.java
-@OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+@OneToMany(mappedBy = "client", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 private List<Reservation> reservations = new ArrayList<>();
 
 // Reservation.java
@@ -158,17 +160,17 @@ Reservation (1) ──────────────── (1) Contrat
 
 - **Côté propriétaire** : `Contrat.reservation` — porte la FK `reservation_id` (unique).
 - **Côté inverse** : `Reservation.contrat` — `mappedBy="reservation"`.
-- **Cascade** : `CascadeType.ALL` + `orphanRemoval = true` sur le côté inverse — suppression d'une `Reservation` entraîne la suppression du `Contrat` associé.
+- **Cascade** : `CascadeType.ALL` sur le côté `Reservation` — un contrat n'existe que pour une réservation : il est enregistré et supprimé avec elle.
 - **Fetch** : `LAZY` des deux côtés (surcharge du défaut EAGER de `@OneToOne`).
 
 ```java
 // Contrat.java
 @OneToOne(fetch = FetchType.LAZY)
-@JoinColumn(name = "reservation_id", nullable = false, unique = true)
+@JoinColumn(name = "reservation_id", unique = true)
 private Reservation reservation;
 
 // Reservation.java
-@OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+@OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 private Contrat contrat;
 ```
 
@@ -181,12 +183,12 @@ Vehicule (1) ──────────────── (*) Maintenance
 
 - **Côté propriétaire** : `Maintenance.vehicule` — porte la FK `vehicule_id`.
 - **Côté inverse** : `Vehicule.maintenances` — `mappedBy="vehicule"`.
-- **Cascade** : `CascadeType.ALL` + `orphanRemoval = true` — suppression d'un `Vehicule` entraîne la suppression de toutes ses `Maintenance`.
+- **Cascade** : `CascadeType.PERSIST` uniquement — les maintenances sont créées via le véhicule, mais leur historique n'est pas supprimé avec lui.
 - **Fetch** : `LAZY` des deux côtés.
 
 ```java
 // Vehicule.java
-@OneToMany(mappedBy = "vehicule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+@OneToMany(mappedBy = "vehicule", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 private List<Maintenance> maintenances = new ArrayList<>();
 
 // Maintenance.java
@@ -228,7 +230,7 @@ ALTER TABLE reservation ADD COLUMN vehicule_id BIGINT NOT NULL;
 ALTER TABLE reservation ADD CONSTRAINT fk_reservation_vehicule FOREIGN KEY (vehicule_id) REFERENCES vehicule(id_vehicule);
 
 -- FK Contrat → Reservation (unique)
-ALTER TABLE contrat ADD COLUMN reservation_id BIGINT NOT NULL UNIQUE;
+ALTER TABLE contrat ADD COLUMN reservation_id BIGINT UNIQUE;
 ALTER TABLE contrat ADD CONSTRAINT fk_contrat_reservation FOREIGN KEY (reservation_id) REFERENCES reservation(id_reservation);
 
 -- FK Maintenance → Vehicule

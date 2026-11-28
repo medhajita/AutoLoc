@@ -23,27 +23,18 @@ public class Contrat {
     @Column(nullable = false)
     private LocalDate dateSignature;
 
-    @Column(nullable = false)
-    private LocalDate dateDebutLocation;
-
-    @Column(nullable = false)
-    private LocalDate dateFinLocation;
-
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal montantTotal;
 
     @Column(nullable = false)
-    private Integer kilometrageDepart;
+    private boolean valide;
 
-    @Column
-    private Integer kilometrageRetour;
-
-    // Association bidirectionnelle Reservation ↔ Contrat (côté propriétaire : Contrat)
+    // Reservation ↔ Contrat (côté propriétaire : Contrat)
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id", nullable = false, unique = true)
+    @JoinColumn(name = "reservation_id", unique = true)
     private Reservation reservation;
 
-    // Association bidirectionnelle Contrat → Paiements (côté propriétaire : Paiement.contrat)
+    // Contrat 1 — * Paiement (composition) : Paiement possède la clé étrangère
     @OneToMany(mappedBy = "contrat", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Paiement> paiements = new ArrayList<>();
 }

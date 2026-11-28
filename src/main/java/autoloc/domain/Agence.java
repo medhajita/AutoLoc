@@ -21,14 +21,14 @@ public class Agence {
     @Column(nullable = false, length = 100)
     private String nom;
 
+    @Column(nullable = false, length = 50)
+    private String ville;
+
     @Column(nullable = false, length = 255)
     private String adresse;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private String telephone;
-
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
 
     @OneToMany(mappedBy = "agence", fetch = FetchType.LAZY)
     private List<Vehicule> vehicules = new ArrayList<>();
