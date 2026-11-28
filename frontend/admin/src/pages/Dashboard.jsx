@@ -1,70 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api, dateCourte, money, nbJours, notifyReservationsChanged } from '../api.js'
 import { useList } from '../hooks.js'
-
-const FENETRE = 35 // jours affichés dans le planning
-const addDays = (d, n) => new Date(d.getTime() + n * 86400000)
-const iso = (d) => d.toISOString().slice(0, 10)
-
-function Planning({ vehicules, reservations }) {
-  const debut = useMemo(() => {
-    const d = new Date()
-    d.setHours(0, 0, 0, 0)
-    return d
-  }, [])
-  const fin = addDays(debut, FENETRE - 1)
-  const pct = (d) => ((new Date(`${d}T00:00:00`) - debut) / 86400000 / FENETRE) * 100
-
-  const bar = (r) => {
-    const s = Math.max(0, pct(r.dateDebut))
-    const e = Math.min(100, pct(r.dateFin) + 100 / FENETRE)
-    return e > s ? { left: `${s}%`, width: `${e - s}%` } : null
-  }
-
-  return (
-    <section className="panel span8">
-      <div className="panel-head">
-        <h3>Planning du parc</h3>
-        <span className="muted small">
-          {dateCourte(iso(debut))} → {dateCourte(iso(fin))}
-        </span>
-      </div>
-      {vehicules.map((v) => {
-        const bars = reservations
-          .filter((r) => r.vehiculeId === v.idVehicule && (r.statut === 'EN_ATTENTE' || r.statut === 'CONFIRMEE'))
-          .map((r) => ({ r, pos: bar(r) }))
-          .filter((b) => b.pos)
-        return (
-          <div className="plan-row" key={v.idVehicule}>
-            <div className="plan-name">{v.marque} {v.modele}</div>
-            <div className="plan-track">
-              {v.statut === 'MAINTENANCE' && (
-                <div className="plan-bar maint" style={{ left: 0, width: '100%' }}>En maintenance</div>
-              )}
-              {bars.map(({ r, pos }) => (
-                <div key={r.idReservation} className={`plan-bar ${r.statut}`} style={pos}>
-                  {r.clientNom}
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      })}
-      <div className="legend">
-        <span><i className="dot ok" />Confirmée</span>
-        <span><i className="dot wait" />En attente</span>
-        <span><i className="dot maint" />Maintenance</span>
-      </div>
-    </section>
-  )
-}
 
 export default function Dashboard({ goTo }) {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const reservations = useList('/reservations')
   const vehicules = useList('/vehicules')
-  const [prix, setPrix] = useState({})
 
   const load = useCallback(() => {
     api('/dashboard').then(setData).catch((e) => setError(e.message))
@@ -72,9 +14,8 @@ export default function Dashboard({ goTo }) {
   }, [reservations.reload]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(load, [load])
-  useEffect(() => {
-    setPrix(Object.fromEntries(vehicules.items.map((v) => [v.idVehicule, Number(v.tarifJournalier)])))
-  }, [vehicules.items])
+
+  const prix = Object.fromEntries(vehicules.items.map((v) => [v.idVehicule, Number(v.tarifJournalier)]))
 
   async function decide(r, statut) {
     try {
@@ -120,11 +61,10 @@ export default function Dashboard({ goTo }) {
         ))}
       </div>
 
-      <div className="grid12">
-        <Planning vehicules={vehicules.items} reservations={reservations.items} />
-        <section className="panel span4">
-          <h3>À traiter</h3>
-          {aTraiter.length === 0 && <p className="muted small">Aucune réservation en attente.</p>}
+      <section className="panel">
+        <h3>À traiter</h3>
+        {aTraiter.length === 0 && <p className="muted small">Aucune réservation en attente.</p>}
+        <div className="todo-grid">
           {aTraiter.map((r) => (
             <div className="todo" key={r.idReservation}>
               <div className="todo-head">
@@ -141,8 +81,8 @@ export default function Dashboard({ goTo }) {
               </div>
             </div>
           ))}
-        </section>
-      </div>
+        </div>
+      </section>
     </>
   )
 }

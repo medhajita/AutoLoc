@@ -130,21 +130,7 @@ tbody tr:hover { background: #f8fafc; }
 .details dd { margin: 0; }
 .todo { border: 1px solid #ddd6fe; background: #f5f3ff; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
 .todo-head { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-
-/* Planning */
-.plan-row { display: flex; align-items: center; gap: 12px; }
-.plan-name { flex: 0 0 120px; font-size: 14px; font-weight: 600; }
-.plan-track { flex: 1; position: relative; height: 36px; border-radius: 8px; background: #f1f5f9; }
-.plan-bar {
-  position: absolute; top: 4px; bottom: 4px; border-radius: 6px; color: #fff; font-size: 12px; font-weight: 600;
-  display: flex; align-items: center; padding: 0 10px; overflow: hidden; white-space: nowrap; background: var(--ok);
-}
-.plan-bar.EN_ATTENTE { background: #7c3aed; }
-.plan-bar.maint { background: #64748b; }
-.legend { display: flex; gap: 20px; font-size: 12px; color: var(--muted); padding-left: 132px; flex-wrap: wrap; }
-.dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; background: #64748b; }
-.dot.ok { background: var(--ok); }
-.dot.wait { background: #7c3aed; }
+.todo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
 
 .muted { color: var(--muted); }
 .small { font-size: 14px; }
@@ -166,5 +152,4 @@ tbody tr:hover { background: #f8fafc; }
   .content { padding: 20px 16px; }
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .span8, .span4 { grid-column: 1 / -1; }
-  .legend { padding-left: 0; }
 }
