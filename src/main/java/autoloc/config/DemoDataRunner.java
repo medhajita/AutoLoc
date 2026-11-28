@@ -10,6 +10,7 @@ import autoloc.repository.AgenceRepository;
 import autoloc.repository.ClientRepository;
 import autoloc.repository.CompteClientRepository;
 import autoloc.repository.VehiculeRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -26,10 +27,13 @@ public class DemoDataRunner implements CommandLineRunner {
     private final ClientRepository clientRepository;
     private final CompteClientRepository compteClientRepository;
     private final PasswordEncoder encoder;
+    private final String demoClientPassword;
 
     public DemoDataRunner(VehiculeRepository vehiculeRepository, AgenceRepository agenceRepository,
                           ClientRepository clientRepository, CompteClientRepository compteClientRepository,
-                          PasswordEncoder encoder) {
+                          PasswordEncoder encoder,
+                          @Value("${AUTOLOC_DEMO_CLIENT_PASSWORD:client123}") String demoClientPassword) {
+        this.demoClientPassword = demoClientPassword;
         this.vehiculeRepository = vehiculeRepository;
         this.agenceRepository = agenceRepository;
         this.clientRepository = clientRepository;
@@ -62,7 +66,7 @@ public class DemoDataRunner implements CommandLineRunner {
                     .ifPresent(c -> {
                         CompteClient compte = new CompteClient();
                         compte.setEmail(c.getEmail());
-                        compte.setMotDePasse(encoder.encode("client123"));
+                        compte.setMotDePasse(encoder.encode(demoClientPassword));
                         compte.setClient(c);
                         compteClientRepository.save(compte);
                     });
